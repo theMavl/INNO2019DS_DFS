@@ -425,6 +425,8 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
             success=success,
             response=response)
 
+
+class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
     def SSLogin(self, request, context):
         ss_address = context.peer()[5:]
         if ss_address[:5] == "[::1]":
@@ -451,8 +453,6 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
 
         return response
 
-
-class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
     def SSGotChunk(self, request, context):
         ss_uuid = request.ss_uuid
         chunk_uuid = request.chunk_uuid
