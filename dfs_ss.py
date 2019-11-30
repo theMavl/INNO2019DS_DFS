@@ -18,15 +18,21 @@ hosting = os.environ.get('HOSTING', "localhost")
 """
 Public address: Fixed port
 Private address: Random port
+
+aws:
+    PRIVATE_ADDRESS, PUBLIC_PORT
+    
+custom:
+    PRIVATE_ADDRESS, PUBLIC_IP
 """
 
 PRIVATE_ADDRESS = None
 
 if hosting == "aws":
-    PUBLIC_ADDRESS = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").read().decode(
-        "utf-8")
-    PRIVATE_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/local-ipv4").read().decode(
-        "utf-8")
+    PUBLIC_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").read().decode("utf-8")
+    PUBLIC_PORT = os.environ.get('PUBLIC_PORT', 23334)
+    PUBLIC_ADDRESS = '{}:{}'.format(PUBLIC_IP, PUBLIC_PORT)
+    PRIVATE_IP = os.environ['PRIVATE_IP']
 elif hosting == "custom" and "PUBLIC_ADDRESS" in os.environ and "PRIVATE_IP" in os.environ:
     PUBLIC_ADDRESS = os.environ['PUBLIC_ADDRESS']
     PRIVATE_IP = os.environ['PRIVATE_IP']
