@@ -642,9 +642,13 @@ def main():
     dispatcher.connect(broadcast_update, signal=SIGNAL_BROADCAST_UPDATE)
     dispatcher.connect(broadcast_nuke, signal=SIGNAL_BROADCAST_NUKE)
 
+    fake_public_address = PUBLIC_ADDRESS.split(':')
+    fake_public_address[0] = "0.0.0.0"
+    fake_public_address = ":".join(fake_public_address)
+
     server_public = grpc.server(ThreadPoolExecutor())
     dfs_pb2_grpc.add_DFS_NamingServerServicer_to_server(DFS_NamingServerServicer(), server_public)
-    server_public.add_insecure_port(PUBLIC_ADDRESS)
+    server_public.add_insecure_port(fake_public_address)
     print("Start public NS at", PUBLIC_ADDRESS)
     server_public.start()
 
