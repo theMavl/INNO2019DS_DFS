@@ -15,21 +15,28 @@ import urllib.request
 
 hosting = os.environ.get('HOSTING', "localhost")
 
+"""
+Public address: Fixed port
+Private address: Random port
+"""
+
+PRIVATE_ADDRESS = None
+
 if hosting == "aws":
     PUBLIC_ADDRESS = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").read().decode(
         "utf-8")
-    PRIVATE_ADDRESS = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/local-ipv4").read().decode(
+    PRIVATE_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/local-ipv4").read().decode(
         "utf-8")
-elif hosting == "custom" and "PUBLIC_ADDRESS" in os.environ and "PRIVATE_ADDRESS" in os.environ:
-    PUBLIC_ADDRESS = os.environ['PUBLIC_IP']
-    PRIVATE_ADDRESS = os.environ['PRIVATE_IP']
+elif hosting == "custom" and "PUBLIC_ADDRESS" in os.environ and "PRIVATE_IP" in os.environ:
+    PUBLIC_ADDRESS = os.environ['PUBLIC_ADDRESS']
+    PRIVATE_IP = os.environ['PRIVATE_IP']
 else:
-    PUBLIC_ADDRESS = "127.0.0.1"
-    PRIVATE_ADDRESS = "127.0.0.1"
+    PUBLIC_ADDRESS = "127.0.0.1:23334"
+    PRIVATE_IP = "127.0.0.1"
 
 # Allow for auto assigning port
-PUBLIC_ADDRESS += ":"
-PRIVATE_ADDRESS += ":"
+# PUBLIC_ADDRESS += ":"
+PRIVATE_IP += ":"
 
 NS_PUBLIC_ADDRESS = os.environ.get('NS_PUBLIC_ADDRESS', '127.0.0.1:23333')
 NS_PRIVATE_ADDRESS = None
@@ -53,11 +60,12 @@ FS = fs.open_fs("storage")
 
 
 def ns_link():
+    global NS_PUBLIC_ADDRESS
     global NS_PRIVATE_ADDRESS
     global PUBLIC_ADDRESS
     global PRIVATE_ADDRESS
 
-    print("LINK:", PUBLIC_ADDRESS, PRIVATE_ADDRESS)
+    print("Connecting to", NS_PUBLIC_ADDRESS)
 
     walker = Walker()
     chunks_list = []
@@ -75,6 +83,7 @@ def ns_link():
     ns_channel.close()
 
     if not response.success:
+        print("Connected to Naming Server. Pending Sync...")
         print(response.response)
         exit(1)
     else:
@@ -91,6 +100,7 @@ def ns_link():
                 req = dfs_pb2.SyncChunkUUID(ss_uuid=SS_UUID, chunks_n=chunks_n, chunk_uuid=c)
                 yield req
 
+    print("Connecting to", NS_PRIVATE_ADDRESS)
     ns_priv_channel = grpc.insecure_channel(NS_PRIVATE_ADDRESS)
     ns_stub = dfs_pb2_grpc.DFS_NSPrivateStub(ns_priv_channel)
     response = ns_stub.SSSync(request_messages())
@@ -98,6 +108,7 @@ def ns_link():
         print(r)
         handle_sync_cmd(r)
     ns_priv_channel.close()
+    print("Sync Complete.")
 
 
 def beat():
@@ -211,6 +222,7 @@ def handle_sync_cmd(request):
 
 class DFS_StorageServerServicer(dfs_pb2_grpc.DFS_StorageServerServicer):
     def write(self, request_iterator, context):
+        print("{}: write".format(context.peer()))
         first_processed = False
         target_chunks = []
         size = 0
@@ -267,7 +279,7 @@ class DFS_StorageServerServicer(dfs_pb2_grpc.DFS_StorageServerServicer):
         return dfs_pb2.GenericResponse(success=True)
 
     def get(self, request, context):
-        print("get {}".format(request.chunk_uuid))
+        print("{}: get {}".format(context.peer(), request.chunk_uuid))
         real_path = FS.getospath(request.chunk_uuid)
         with open(real_path, 'rb') as content_file:
             content = content_file.read()
@@ -275,23 +287,24 @@ class DFS_StorageServerServicer(dfs_pb2_grpc.DFS_StorageServerServicer):
         yield dfs_pb2.Chunk(Content=content)
 
     def has(self, request, context):
-        print("has {}".format(request.chunk_uuid))
+        print("{}: has {}".format(context.peer(), request.chunk_uuid))
         return dfs_pb2.GenericResponse(success=FS.exists(request.chunk_uuid))
 
 
 class DFS_SSPrivateServicer(dfs_pb2_grpc.DFS_SSPrivateServicer):
     def Sync(self, request_iterator, context):
+        print("{}: Sync".format(context.peer()))
         for request in request_iterator:
             handle_sync_cmd(request)
 
         return Empty()
 
     def has(self, request, context):
-        print("has {}".format(request.chunk_uuid))
+        print("{}: has {}".format(context.peer(), request.chunk_uuid))
         return dfs_pb2.GenericResponse(success=FS.exists(request.chunk_uuid))
 
     def get(self, request, context):
-        print("get {}".format(request.chunk_uuid))
+        print("{}: get {}".format(request.chunk_uuid, request.chunk_uuid))
         real_path = FS.getospath(request.chunk_uuid)
         with open(real_path, 'rb') as content_file:
             content = content_file.read()
@@ -299,27 +312,32 @@ class DFS_SSPrivateServicer(dfs_pb2_grpc.DFS_SSPrivateServicer):
         yield dfs_pb2.Chunk(Content=content)
 
     def Nuke(self, request, context):
+        print("{}: Nuke".format(context.peer()))
         print("Pending Nuke...")
         for path in FS.walk.files():
             FS.remove(path)
-            print("Chunk {} nuked")
+            print("Chunk {} nuked".format(path))
 
         return Empty()
 
 
 def main():
     global PUBLIC_ADDRESS
+    global PRIVATE_IP
     global PRIVATE_ADDRESS
+
+    fake_public_address = PUBLIC_ADDRESS.split(':')
+    fake_public_address[0] = "0.0.0.0"
+    fake_public_address = ":".join(fake_public_address)
 
     server_public = grpc.server(ThreadPoolExecutor())
     dfs_pb2_grpc.add_DFS_StorageServerServicer_to_server(DFS_StorageServerServicer(), server_public)
-    public_port = server_public.add_insecure_port(PUBLIC_ADDRESS)
-    PUBLIC_ADDRESS += str(public_port)
+    server_public.add_insecure_port(fake_public_address)  # PUBLIC_ADDRESS)
 
     server_private = grpc.server(ThreadPoolExecutor())
     dfs_pb2_grpc.add_DFS_SSPrivateServicer_to_server(DFS_SSPrivateServicer(), server_private)
-    private_port = server_private.add_insecure_port(PRIVATE_ADDRESS)
-    PRIVATE_ADDRESS += str(private_port)
+    private_port = server_private.add_insecure_port(PRIVATE_IP)
+    PRIVATE_ADDRESS = PRIVATE_IP + str(private_port)
 
     ns_link()
 

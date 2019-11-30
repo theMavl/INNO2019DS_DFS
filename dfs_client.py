@@ -100,6 +100,8 @@ class Session:
             print("Server returned bad JSON")
             return
 
+        print(response_json)
+
         checksum = response_json["hash"]
         chunks = response_json["chunks"]
 
@@ -310,6 +312,7 @@ class Session:
                 response = stub.write(chunks_generator)
                 print(response)
                 success = True
+                channel.close()
                 break
             except Exception as e:
                 print("Error connecting to {}: {}".format(host_str, e))
@@ -332,31 +335,6 @@ class Session:
             handler(args)
         except Exception as e:
             print(e)
-
-
-def ls(stub):
-    print("--------------Call LS Begin--------------")
-    request = dfs_pb2.Request(client_id=CLIENT_ID, request_data="called by Python client")
-    response = stub.ls(request)
-    print("resp from server(%s), the message=%s" % (response.success,
-                                                    response.response))
-    print("--------------Call LS Over---------------")
-
-
-def sl(stub: dfs_pb2.SSSummary):
-    print("--------------Call SL Begin--------------")
-    request = Empty()
-    response = stub.sl(request)
-    for res in response:
-        print(res)
-        break
-    print("--------------Call SL Over---------------")
-
-
-def cd(stub):
-    request = dfs_pb2.Path(cwd="/", filename="lol")
-    response = stub.cd(request)
-    print(response)
 
 
 def get_file_chunks(cwd, filename, fake_path):

@@ -62,6 +62,36 @@ services:
     depends_on:
       - mongo
 
+  storage-server-1:
+    build: ./docker/ss
+    # restart: always
+    container_name: ss1
+    command: python -u dfs_ss.py
+
+    environment:
+      HOSTING: custom
+      PUBLIC_ADDRESS: 127.0.0.1:23334
+      PRIVATE_IP: 172.28.10.11
+      NS_PUBLIC_ADDRESS: 172.28.10.10:23333
+
+    ports:
+      - 23334:23334
+
+    volumes:
+      - ./docker/ss:/src
+      - ./dfs_ss.py:/src/dfs_ss.py
+      - ./dfs_pb2_grpc.py:/src/dfs_pb2_grpc.py
+      - ./dfs_pb2.py:/src/dfs_pb2.py
+      - ./mongo.py:/src/mongo.py
+      - ./requirements.txt:/src/requirements.txt
+
+    networks:
+      dfs_internal:
+        ipv4_address: 172.28.10.11
+
+    depends_on:
+      - naming-server
+
 networks:
     dfs_internal:
         ipam:

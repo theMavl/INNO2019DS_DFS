@@ -19,13 +19,20 @@ import urllib.request
 
 hosting = os.environ.get('HOSTING', "localhost")
 
-if hosting == "aws":
+"""
+aws:
+    PRIVATE_ADDRESS, PUBLIC_PORT
+    
+custom:
+    PRIVATE_ADDRESS, PUBLIC_ADDRESS
+"""
+
+if hosting == "aws" and "PRIVATE_ADDRESS" in os.environ:
     PUBLIC_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").read().decode("utf-8")
-    PRIVATE_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/local-ipv4").read().decode("utf-8")
+    # PRIVATE_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/local-ipv4").read().decode("utf-8")
+    PRIVATE_ADDRESS = os.environ['PRIVATE_ADDRESS']
     PUBLIC_PORT = os.environ.get('PUBLIC_PORT', 23333)
-    PRIVATE_PORT = os.environ.get('PRIVATE_PORT', 33333)
     PUBLIC_ADDRESS = '{}:{}'.format(PUBLIC_IP, PUBLIC_PORT)
-    PRIVATE_ADDRESS = '{}:{}'.format(PRIVATE_IP, PRIVATE_PORT)
 elif hosting == "custom" and "PUBLIC_ADDRESS" in os.environ and "PRIVATE_ADDRESS" in os.environ:
     PUBLIC_ADDRESS = os.environ['PUBLIC_ADDRESS']
     PRIVATE_ADDRESS = os.environ['PRIVATE_ADDRESS']
@@ -60,7 +67,7 @@ def ss_watcher():
         time.sleep(60)
         storages = list(STORAGES.keys())
         for s in storages:
-            print(STORAGES, s)
+            # print(STORAGES, s)
             last_beat_delta = time.time() - STORAGES[s]["last_beat"]
             if last_beat_delta > 5 * 60:
                 print("Storage {} ({}) didn't beat in {} mins. Assuming it is dead".format(STORAGES[s]["address"], s,
@@ -70,7 +77,7 @@ def ss_watcher():
                 for chunk in chunks:
                     CHUNKS.update_one(chunk, {"$pull": {"hosts": s}})
             else:
-                print(last_beat_delta)
+                print("SS-WATCH: {}: {}".format(s, last_beat_delta))
 
 
 def init_chunks_index():
@@ -119,6 +126,7 @@ def get_fileattr_id(filesystem, fake_path):
 
 class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
     def init(self, request, context):
+        print("{}: init".format(context.peer()))
         CHUNKS.drop()
         ATTRS.drop()
         shutil.rmtree('./fs')
@@ -132,13 +140,15 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
 
     def ls(self, request, context):
         req_path = os.path.normpath(os.path.join(request.cwd, request.filename))
-        print("ls {} {}".format(context.peer(), req_path))
+        print("{}: ls {}".format(context.peer(), req_path))
         response = dfs_pb2.GenericResponse(
             success=True,
             response=str(FS.listdir(req_path)))
         return response
 
     def sl(self, request, context):
+        print("{}: sl".format(context.peer()))
+        print(STORAGES.values())
         for s in STORAGES.values():
             ss_addr = s["address"].split(":")
             response = dfs_pb2.SSSummary(
@@ -148,6 +158,7 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
 
     def info(self, request, context):
         req_path = os.path.normpath(os.path.join(request.cwd, request.filename))
+        print("{}: info {}".format(context.peer(), req_path))
         if not FS.exists(req_path):
             success = False
             response = "info: Resource {} not found".format(request.filename)
@@ -179,7 +190,7 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
     def cd(self, request, context):
         print(request)
         req_path = os.path.normpath(os.path.join(request.cwd, request.filename))
-
+        print("{}: cd {}".format(context.peer(), req_path))
         if not FS.exists(req_path):
             success = False
             response = "cd: {}: No such file or directory".format(request.filename)
@@ -198,9 +209,8 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
         )
 
     def which(self, request, context):
-        print(DB.db["dfs"]["chunks"].find({}).explain())
         req_path = os.path.normpath(os.path.join(request.cwd, request.filename))
-
+        print("{}: which {}".format(context.peer(), req_path))
         if FS.isdir(req_path):
             success = False
             response = "which: Is a directory: {}".format(request.filename)
@@ -239,6 +249,7 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
 
     def which_chunk(self, request, context):
         chunk_uuid = request.chunk_uuid
+        print("{}: which_chunk {}".format(context.peer(), chunk_uuid))
         chunk_info = CHUNKS.find_one({"_id": chunk_uuid})
 
         if chunk_info:
@@ -254,6 +265,7 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
 
     def mkdir(self, request, context):
         req_path = os.path.normpath(os.path.join(request.cwd, request.filename))
+        print("{}: mkdir {}".format(context.peer(), req_path))
 
         if FS.exists(req_path):
             success = False
@@ -273,7 +285,7 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
 
     def touch(self, request, context):
         req_path = os.path.normpath(os.path.join(request.cwd, request.filename))
-        print("touch {} {}".format(context.peer(), req_path))
+        print("{}: touch {}".format(context.peer(), req_path))
         hash_str = None
         response = None
         if FS.exists(req_path):
@@ -315,6 +327,7 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
     def mv(self, request, context):
         path_src = os.path.normpath(os.path.join(request.cwd, request.src))
         path_dest = os.path.normpath(os.path.join(request.cwd, request.dest))
+        print("{}: mv {} {}".format(context.peer(), path_src, path_dest))
         response = None
         if FS.exists(path_src):
             if FS.exists(path_dest):
@@ -338,6 +351,7 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
     def cp(self, request, context):
         path_src = os.path.normpath(os.path.join(request.cwd, request.src))
         path_dest = os.path.normpath(os.path.join(request.cwd, request.dest))
+        print("{}: cp {} {}".format(context.peer(), path_src, path_dest))
         response = None
         if FS.exists(path_src):
             if FS.exists(path_dest):
@@ -369,7 +383,7 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
 
     def rm(self, request, context):
         req_path = os.path.normpath(os.path.join(request.cwd, request.filename))
-        print("rm {} {}".format(context.peer(), req_path))
+        print("{}: rm {}".format(context.peer(), req_path))
         response = None
         success = False
 
@@ -417,7 +431,7 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
             tmp = ss_address.split(":")
             ss_address = "127.0.0.1:" + tmp[-1]
 
-        print("Storage {} wants to log-in".format(ss_address))
+        print("{}: SSLogin".format(context.peer()))
         addr = request.exposed_address
         priv_addr = request.private_address
         try:
@@ -442,7 +456,7 @@ class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
     def SSGotChunk(self, request, context):
         ss_uuid = request.ss_uuid
         chunk_uuid = request.chunk_uuid
-        print("SSGotChunk {} ({} chunks)".format(ss_uuid, chunk_uuid))
+        print("{}: SSGotChunk {} ({} chunks)".format(context.peer(), ss_uuid, chunk_uuid))
         if ss_uuid in STORAGES:
             a = CHUNKS.update_one({"_id": chunk_uuid}, {'$addToSet': {'hosts': ss_uuid}})
             if a.modified_count > 0:
@@ -457,7 +471,7 @@ class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
         first = requests[0]
         ss_uuid = first.ss_uuid
         chunks_n = first.chunks_n
-        print("SSSync {} ({} chunks)".format(ss_uuid, chunks_n))
+        print("{}: SSSync {} ({} chunks)".format(context.peer(), ss_uuid, chunks_n))
 
         if ss_uuid in PENDING_SYNC_STORAGES or ss_uuid in STORAGES:
             actual_chunks = set(ATTRS.distinct("chunks"))
@@ -515,7 +529,7 @@ class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
             return dfs_pb2.Update(CMD=dfs_pb2.UpdateCMD.Error)
 
     def SSGotWrite(self, request, context):
-        print("SSGotWrite {} {}".format(request.ss_uuid, request.path))
+        print("{}: SSGotWrite {} {}".format(context.peer(), request.ss_uuid, request.path))
         ss_uuid = request.ss_uuid
         target_file = request.path
         size = request.size
@@ -554,6 +568,7 @@ class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
         return dfs_pb2.GenericResponse(success=True, response="OK")
 
     def SSBeat(self, request, context):
+        print("{}: beat".format(context.peer()))
         ss_uuid = request.ss_uuid
         if ss_uuid in STORAGES:
             storage_info = STORAGES.get(ss_uuid)
@@ -566,6 +581,7 @@ class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
         chunk_uuid = request.chunk_uuid
         chunk_info = CHUNKS.find_one({"_id": chunk_uuid})
 
+        print("{}: which_chunk {}".format(context.peer(), chunk_uuid))
         if chunk_info:
             for host in chunk_info["hosts"]:
                 h = STORAGES[host]
