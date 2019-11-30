@@ -1,0 +1,164 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+message GenericRequest {
+    string request_data = 1;
+}
+
+message Path {
+    string cwd = 1;
+    string filename = 2;
+}
+
+message Path2 {
+    string cwd = 1;
+    string src = 2;
+    string dest = 3;
+}
+
+message SyncChunkUUID {
+    string ss_uuid = 1;
+    uint64 chunks_n = 2;
+    string chunk_uuid = 3;
+}
+
+message ChunkUUID {
+    string chunk_uuid = 1;
+}
+
+message GenericResponse {
+    bool success = 1;
+    string response = 2;
+}
+
+message SSSummary {
+    GenericResponse response = 1;
+    string ip_address = 2;
+    uint32 port = 3;
+}
+
+message FileChunk {
+    GenericResponse response = 1;
+    uint32 chunk_n = 2;
+    string chunk_uuid = 3;
+    repeated SSSummary hosts = 4;
+}
+
+message Chunk {
+    uint64 chunk_n = 1;
+    Path path = 2;
+    bytes Content = 3;
+}
+
+enum UploadStatusCode {
+    Unknown = 0;
+    Ok = 1;
+    Failed = 2;
+}
+
+enum UpdateCMD {
+    Error = 0;
+    OK = 1;
+    get = 2;
+    remove = 3;
+}
+
+message UploadStatus {
+    string Message = 1;
+    UploadStatusCode Code = 2;
+}
+
+message Update {
+    UpdateCMD CMD = 1;
+    string chunk_uuid = 2;
+    repeated string hosts = 3;
+}
+
+message SSLoginInfo {
+    string ss_uuid = 1;
+    string exposed_address = 2;
+    string private_address = 3;
+    uint64 chunks_n = 4;
+}
+
+message SSFileUpdateInfo {
+    string ss_uuid = 1;
+    string path = 2;
+    uint64 size = 3;
+    string hash = 4;
+    repeated string chunks = 5;
+}
+
+message TouchResult {
+    bool success = 1;
+    bool exists = 2;
+    string hash = 3;
+    string response = 4;
+}
+
+message SSBeatInfo {
+    string ss_uuid = 1;
+}
+
+message SSGotWriteInfo {
+    string ss_uuid = 1;
+    string path = 2;
+    uint64 size = 3;
+    string hash = 4;
+    repeated string chunks = 5;
+}
+
+service DFS_NamingServer {
+    rpc init (google.protobuf.Empty) returns (GenericResponse);
+
+    rpc ls (Path) returns (GenericResponse);
+
+    rpc sl (google.protobuf.Empty) returns (stream SSSummary);
+
+    rpc cd (Path) returns (GenericResponse);
+
+    rpc rm (Path) returns (GenericResponse);
+
+    rpc cp (Path2) returns (GenericResponse);
+
+    rpc mv (Path2) returns (GenericResponse);
+
+    rpc which (Path) returns (GenericResponse);
+
+    rpc which_chunk (ChunkUUID) returns (stream SSSummary);
+
+    rpc info (Path) returns (GenericResponse);
+
+    rpc mkdir (Path) returns (GenericResponse);
+
+    rpc touch (Path) returns (TouchResult);
+
+    rpc rename (Path2) returns (GenericResponse);
+
+    rpc SSLogin (SSLoginInfo) returns (GenericResponse); // SS -> NS
+
+}
+
+service DFS_NSPrivate {
+    rpc which_chunk (ChunkUUID) returns (stream SSSummary); // Returns private address
+    rpc SSSync (stream SyncChunkUUID) returns (stream Update); // SS -> NS
+    rpc SSGotChunk (SyncChunkUUID) returns (google.protobuf.Empty);
+    rpc SSFileUpdate (SSFileUpdateInfo) returns (GenericResponse); // SS -> NS
+    rpc SSBeat (SSBeatInfo) returns (GenericResponse); // SS -> NS
+    rpc SSGotWrite (SSGotWriteInfo) returns (GenericResponse);
+}
+
+service DFS_StorageServer {
+    rpc has (ChunkUUID) returns (GenericResponse);
+
+    rpc get (ChunkUUID) returns (stream Chunk);
+
+    rpc write (stream Chunk) returns (GenericResponse);
+}
+
+service DFS_SSPrivate {
+    rpc Sync (stream Update) returns (google.protobuf.Empty);
+    rpc get (ChunkUUID) returns (stream Chunk); // For private address
+    rpc has (ChunkUUID) returns (GenericResponse); // For private address
+    rpc Nuke (google.protobuf.Empty) returns (google.protobuf.Empty);
+}
