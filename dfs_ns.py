@@ -577,6 +577,47 @@ class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
         else:
             return dfs_pb2.GenericResponse(success=False, response="Who the hell are you?")
 
+    def touch(self, request, context):
+        req_path = os.path.normpath(os.path.join(request.cwd, request.filename))
+        print("{}: touch {}".format(context.peer(), req_path))
+        hash_str = None
+        response = None
+        if FS.exists(req_path):
+            exists = True
+            if FS.isdir(req_path):
+                success = False
+                response = "touch: is an existing directory"
+            else:
+                file_attr_id = get_fileattr_id(FS, req_path)
+                print("Looking for", file_attr_id)
+                file_attrs = ATTRS.find_one({"_id": ObjectId(file_attr_id)})
+                # file_attrs = ATTRS.find_one({"path": req_path})
+                if file_attrs:
+                    hash_str = file_attrs.pop("hash", None)
+                    success = True
+                else:
+                    print("File {} exists in FS but not in Cache!".format(req_path))
+                    ins = ATTRS.insert_one({"hash": None, "size": 0, "chunks": []})
+                    with open(FS.getospath(req_path), "w") as f:
+                        f.write(str(ins.inserted_id))
+                    success = True
+
+        else:
+            FS.touch(req_path)
+            ins = ATTRS.insert_one({"hash": None, "size": 0, "chunks": []})
+            # print(ins.inserted_id)
+            with open(FS.getospath(req_path), "w") as f:
+                f.write(str(ins.inserted_id))
+            success = True
+            exists = False
+            response = req_path
+
+        return dfs_pb2.TouchResult(
+            success=success,
+            response=response,
+            exists=exists,
+            hash=hash_str)
+
     def which_chunk(self, request, context):
         chunk_uuid = request.chunk_uuid
         chunk_info = CHUNKS.find_one({"_id": chunk_uuid})

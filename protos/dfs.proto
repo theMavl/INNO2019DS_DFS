@@ -134,13 +134,12 @@ service DFS_NamingServer {
     rpc touch (Path) returns (TouchResult);
 
     rpc rename (Path2) returns (GenericResponse);
-
-    rpc SSLogin (SSLoginInfo) returns (GenericResponse); // SS -> NS
-
 }
 
 service DFS_NSPrivate {
+    rpc touch (Path) returns (TouchResult);
     rpc which_chunk (ChunkUUID) returns (stream SSSummary); // Returns private address
+    rpc SSLogin (SSLoginInfo) returns (GenericResponse); // SS -> NS
     rpc SSSync (stream SyncChunkUUID) returns (stream Update); // SS -> NS
     rpc SSGotChunk (SyncChunkUUID) returns (google.protobuf.Empty);
     rpc SSFileUpdate (SSFileUpdateInfo) returns (GenericResponse); // SS -> NS

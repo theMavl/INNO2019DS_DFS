@@ -80,11 +80,6 @@ class DFS_NamingServerStub(object):
         request_serializer=dfs__pb2.Path2.SerializeToString,
         response_deserializer=dfs__pb2.GenericResponse.FromString,
         )
-    self.SSLogin = channel.unary_unary(
-        '/DFS_NamingServer/SSLogin',
-        request_serializer=dfs__pb2.SSLoginInfo.SerializeToString,
-        response_deserializer=dfs__pb2.GenericResponse.FromString,
-        )
 
 
 class DFS_NamingServerServicer(object):
@@ -182,13 +177,6 @@ class DFS_NamingServerServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def SSLogin(self, request, context):
-    """SS -> NS
-    """
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
 
 def add_DFS_NamingServerServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -257,11 +245,6 @@ def add_DFS_NamingServerServicer_to_server(servicer, server):
           request_deserializer=dfs__pb2.Path2.FromString,
           response_serializer=dfs__pb2.GenericResponse.SerializeToString,
       ),
-      'SSLogin': grpc.unary_unary_rpc_method_handler(
-          servicer.SSLogin,
-          request_deserializer=dfs__pb2.SSLoginInfo.FromString,
-          response_serializer=dfs__pb2.GenericResponse.SerializeToString,
-      ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
       'DFS_NamingServer', rpc_method_handlers)
@@ -278,10 +261,20 @@ class DFS_NSPrivateStub(object):
     Args:
       channel: A grpc.Channel.
     """
+    self.touch = channel.unary_unary(
+        '/DFS_NSPrivate/touch',
+        request_serializer=dfs__pb2.Path.SerializeToString,
+        response_deserializer=dfs__pb2.TouchResult.FromString,
+        )
     self.which_chunk = channel.unary_stream(
         '/DFS_NSPrivate/which_chunk',
         request_serializer=dfs__pb2.ChunkUUID.SerializeToString,
         response_deserializer=dfs__pb2.SSSummary.FromString,
+        )
+    self.SSLogin = channel.unary_unary(
+        '/DFS_NSPrivate/SSLogin',
+        request_serializer=dfs__pb2.SSLoginInfo.SerializeToString,
+        response_deserializer=dfs__pb2.GenericResponse.FromString,
         )
     self.SSSync = channel.stream_stream(
         '/DFS_NSPrivate/SSSync',
@@ -314,8 +307,22 @@ class DFS_NSPrivateServicer(object):
   # missing associated documentation comment in .proto file
   pass
 
+  def touch(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def which_chunk(self, request, context):
     """Returns private address
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def SSLogin(self, request, context):
+    """SS -> NS
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -359,10 +366,20 @@ class DFS_NSPrivateServicer(object):
 
 def add_DFS_NSPrivateServicer_to_server(servicer, server):
   rpc_method_handlers = {
+      'touch': grpc.unary_unary_rpc_method_handler(
+          servicer.touch,
+          request_deserializer=dfs__pb2.Path.FromString,
+          response_serializer=dfs__pb2.TouchResult.SerializeToString,
+      ),
       'which_chunk': grpc.unary_stream_rpc_method_handler(
           servicer.which_chunk,
           request_deserializer=dfs__pb2.ChunkUUID.FromString,
           response_serializer=dfs__pb2.SSSummary.SerializeToString,
+      ),
+      'SSLogin': grpc.unary_unary_rpc_method_handler(
+          servicer.SSLogin,
+          request_deserializer=dfs__pb2.SSLoginInfo.FromString,
+          response_serializer=dfs__pb2.GenericResponse.SerializeToString,
       ),
       'SSSync': grpc.stream_stream_rpc_method_handler(
           servicer.SSSync,

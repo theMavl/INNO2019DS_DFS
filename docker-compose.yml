@@ -42,7 +42,7 @@ services:
     environment:
       HOSTING: custom
       PUBLIC_ADDRESS: 0.0.0.0:23333
-      PRIVATE_ADDRESS: 172.28.10.10:33333
+      PRIVATE_ADDRESS: 192.168.10.10:33333
 
     ports:
       - 23333:23333
@@ -57,7 +57,7 @@ services:
 
     networks:
       dfs_internal:
-        ipv4_address: 172.28.10.10
+        ipv4_address: 192.168.10.10
 
     depends_on:
       - mongo
@@ -71,8 +71,8 @@ services:
     environment:
       HOSTING: custom
       PUBLIC_ADDRESS: 127.0.0.1:23334
-      PRIVATE_IP: 172.28.10.11
-      NS_PUBLIC_ADDRESS: 172.28.10.10:23333
+      PRIVATE_IP: 192.168.10.11
+      NS_PRIVATE_ADDRESS: 192.168.10.10:33333
 
     ports:
       - 23334:23334
@@ -87,7 +87,7 @@ services:
 
     networks:
       dfs_internal:
-        ipv4_address: 172.28.10.11
+        ipv4_address: 192.168.10.11
 
     depends_on:
       - naming-server
@@ -97,4 +97,4 @@ networks:
         ipam:
             driver: default
             config:
-                - subnet: 172.28.0.0/16
+                - subnet: 192.168.0.0/16

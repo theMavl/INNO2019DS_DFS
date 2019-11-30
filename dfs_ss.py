@@ -44,8 +44,7 @@ else:
 # PUBLIC_ADDRESS += ":"
 PRIVATE_IP += ":"
 
-NS_PUBLIC_ADDRESS = os.environ.get('NS_PUBLIC_ADDRESS', '127.0.0.1:23333')
-NS_PRIVATE_ADDRESS = None
+NS_PRIVATE_ADDRESS = os.environ.get('NS_PRIVATE_ADDRESS', '127.0.0.1:33333')
 
 if os.path.exists("./SS_UUID"):
     with open("./SS_UUID", "r") as f:
@@ -66,12 +65,11 @@ FS = fs.open_fs("storage")
 
 
 def ns_link():
-    global NS_PUBLIC_ADDRESS
     global NS_PRIVATE_ADDRESS
     global PUBLIC_ADDRESS
     global PRIVATE_ADDRESS
 
-    print("Connecting to", NS_PUBLIC_ADDRESS)
+    print("Connecting to", NS_PRIVATE_ADDRESS)
 
     walker = Walker()
     chunks_list = []
@@ -81,19 +79,17 @@ def ns_link():
 
     chunks_n = len(chunks_list)
 
-    ns_channel = grpc.insecure_channel(NS_PUBLIC_ADDRESS)
-    ns_stub = dfs_pb2_grpc.DFS_NamingServerStub(ns_channel)
+    ns_channel = grpc.insecure_channel(NS_PRIVATE_ADDRESS)
+    ns_stub = dfs_pb2_grpc.DFS_NSPrivateStub(ns_channel)
     request = dfs_pb2.SSLoginInfo(ss_uuid=SS_UUID, exposed_address=PUBLIC_ADDRESS, private_address=PRIVATE_ADDRESS,
                                   chunks_n=chunks_n)
     response = ns_stub.SSLogin(request)
-    ns_channel.close()
+    # ns_channel.close()
 
     if not response.success:
         print("Connected to Naming Server. Pending Sync...")
         print(response.response)
         exit(1)
-    else:
-        NS_PRIVATE_ADDRESS = response.response
 
     print(chunks_list)
 
@@ -106,14 +102,14 @@ def ns_link():
                 req = dfs_pb2.SyncChunkUUID(ss_uuid=SS_UUID, chunks_n=chunks_n, chunk_uuid=c)
                 yield req
 
-    print("Connecting to", NS_PRIVATE_ADDRESS)
-    ns_priv_channel = grpc.insecure_channel(NS_PRIVATE_ADDRESS)
-    ns_stub = dfs_pb2_grpc.DFS_NSPrivateStub(ns_priv_channel)
+    # print("Connecting to", NS_PRIVATE_ADDRESS)
+    # ns_priv_channel = grpc.insecure_channel(NS_PRIVATE_ADDRESS)
+    # ns_stub = dfs_pb2_grpc.DFS_NSPrivateStub(ns_priv_channel)
     response = ns_stub.SSSync(request_messages())
     for r in response:
         print(r)
         handle_sync_cmd(r)
-    ns_priv_channel.close()
+    ns_channel.close()
     print("Sync Complete.")
 
 
@@ -245,8 +241,8 @@ class DFS_StorageServerServicer(dfs_pb2_grpc.DFS_StorageServerServicer):
                 path = request.path
                 print("write {} {}{}".format(context.peer(), path.cwd, path.filename))
 
-                ns_channel = grpc.insecure_channel(NS_PUBLIC_ADDRESS)
-                ns_stub = dfs_pb2_grpc.DFS_NamingServerStub(ns_channel)
+                ns_channel = grpc.insecure_channel(NS_PRIVATE_ADDRESS)
+                ns_stub = dfs_pb2_grpc.DFS_NSPrivateStub(ns_channel)
                 ns_response = ns_stub.touch(path)
 
                 if not ns_response.success:
