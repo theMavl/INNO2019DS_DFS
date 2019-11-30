@@ -20,19 +20,28 @@ import urllib.request
 hosting = os.environ.get('HOSTING', "localhost")
 
 """
-aws:
+aws-many:
+    PRIVATE_PORT, PUBLIC_PORT
+    
+aws-single:
     PRIVATE_ADDRESS, PUBLIC_PORT
     
 custom:
     PRIVATE_ADDRESS, PUBLIC_ADDRESS
 """
 
-if hosting == "aws" and "PRIVATE_ADDRESS" in os.environ:
+if hosting == "aws-single" and "PRIVATE_ADDRESS" in os.environ:
     PUBLIC_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").read().decode("utf-8")
-    # PRIVATE_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/local-ipv4").read().decode("utf-8")
     PRIVATE_ADDRESS = os.environ['PRIVATE_ADDRESS']
     PUBLIC_PORT = os.environ.get('PUBLIC_PORT', 23333)
     PUBLIC_ADDRESS = '{}:{}'.format(PUBLIC_IP, PUBLIC_PORT)
+elif hosting == "aws-many" and "PRIVATE_PORT" in os.environ:
+    PUBLIC_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").read().decode("utf-8")
+    PRIVATE_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/local-ipv4").read().decode("utf-8")
+    PUBLIC_PORT = os.environ.get('PUBLIC_PORT', 23333)
+    PRIVATE_PORT = os.environ.get('PUBLIC_PORT', 33333)
+    PUBLIC_ADDRESS = '{}:{}'.format(PUBLIC_IP, PUBLIC_PORT)
+    PRIVATE_ADDRESS = '{}:{}'.format(PRIVATE_IP, PRIVATE_PORT)
 elif hosting == "custom" and "PUBLIC_ADDRESS" in os.environ and "PRIVATE_ADDRESS" in os.environ:
     PUBLIC_ADDRESS = os.environ['PUBLIC_ADDRESS']
     PRIVATE_ADDRESS = os.environ['PRIVATE_ADDRESS']
@@ -646,6 +655,10 @@ def main():
     fake_public_address[0] = "0.0.0.0"
     fake_public_address = ":".join(fake_public_address)
 
+    fake_private_address = PRIVATE_ADDRESS.split(':')
+    fake_private_address[0] = "0.0.0.0"
+    fake_private_address = ":".join(fake_private_address)
+
     server_public = grpc.server(ThreadPoolExecutor())
     dfs_pb2_grpc.add_DFS_NamingServerServicer_to_server(DFS_NamingServerServicer(), server_public)
     server_public.add_insecure_port(fake_public_address)
@@ -654,7 +667,7 @@ def main():
 
     server_private = grpc.server(ThreadPoolExecutor())
     dfs_pb2_grpc.add_DFS_NSPrivateServicer_to_server(DFS_NSPrivateServicer(), server_private)
-    server_private.add_insecure_port(PRIVATE_ADDRESS)
+    server_private.add_insecure_port(fake_private_address)
     print("Start private NS at", PRIVATE_ADDRESS)
     server_private.start()
 

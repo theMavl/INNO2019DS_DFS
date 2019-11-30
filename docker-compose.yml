@@ -70,7 +70,7 @@ services:
     environment:
       HOSTING: custom
       PUBLIC_ADDRESS: 127.0.0.1:23334
-      PRIVATE_IP: 192.168.10.11
+      PRIVATE_ADDRESS: 192.168.10.11:33334
       NS_PRIVATE_ADDRESS: 192.168.10.10:33333
 
     ports:
