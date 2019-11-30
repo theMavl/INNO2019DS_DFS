@@ -34,7 +34,12 @@ if hosting == "aws-single":
     PUBLIC_ADDRESS = '{}:{}'.format(PUBLIC_IP, PUBLIC_PORT)
     PRIVATE_ADDRESS = os.environ['PRIVATE_ADDRESS']
 elif hosting == "aws-many":
-    pass
+    PUBLIC_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").read().decode("utf-8")
+    PRIVATE_IP = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/local-ipv4").read().decode("utf-8")
+    PUBLIC_PORT = os.environ.get('PUBLIC_PORT', 23333)
+    PRIVATE_PORT = os.environ.get('PRIVATE_PORT', 33333)
+    PUBLIC_ADDRESS = '{}:{}'.format(PUBLIC_IP, PUBLIC_PORT)
+    PRIVATE_ADDRESS = '{}:{}'.format(PRIVATE_IP, PRIVATE_PORT)
 elif hosting == "custom" and "PUBLIC_ADDRESS" in os.environ and "PRIVATE_ADDRESS" in os.environ:
     PUBLIC_ADDRESS = os.environ['PUBLIC_ADDRESS']
     PRIVATE_ADDRESS = os.environ['PRIVATE_ADDRESS']
