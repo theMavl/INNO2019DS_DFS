@@ -1,0 +1,76 @@
+version: '3'
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mavl
+      MONGO_INITDB_ROOT_PASSWORD: pass
+      MONGO_INITDB_DATABASE: dfs
+
+    networks:
+      dfs_internal:
+      
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      # - ./mongo-volume:/data/db
+
+  mongo-express:
+    image: mongo-express
+   # restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: mavl
+      ME_CONFIG_MONGODB_ADMINPASSWORD: pass
+
+    depends_on:
+      - mongo
+
+  naming-server:
+    build: ./docker/ns
+    restart: always
+    container_name: ns
+    command: python -u dfs_ns.py
+
+    environment:
+      HOSTING: aws-many
+      PRIVATE_PORT: 33333
+      PUBLIC_PORT: 23333
+
+    ports:
+      - 23333:23333
+      - 33333:33333
+
+    volumes:
+      - ./docker/ns:/src
+
+    depends_on:
+      - mongo
+
+  storage-server:
+    image: 127.0.0.1:5000/dfs-ss
+    hostname: '{{.Node.Hostname}}'
+    ports:
+      - 23334:23334
+      - 33334:33334
+    
+    command: python -u dfs_ss.py
+
+    volumes:
+      - ./docker/ss:/src
+
+    environment:
+      HOSTING: aws-many
+      PUBLIC_PORT: 23334
+      PRIVATE_PORT: 33334
+      NS_PRIVATE_ADDRESS: 172.31.24.157:33333
+
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+

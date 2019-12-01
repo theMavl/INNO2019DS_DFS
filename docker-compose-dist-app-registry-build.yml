@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  storage-server:
+    build: ./docker/ss
+    # restart: always
+    container_name: ss1
+    image: 127.0.0.1:5000/dfs-ss
+    
+    command: python -u dfs_ss.py
+
+    environment:
+      HOSTING: aws-many
+      PUBLIC_PORT: 23334
+      PRIVATE_PORT: 33334
+      NS_PRIVATE_ADDRESS: 172.31.24.157:33333
+
+    ports:
+      - 23334:23334
+      - 33334:33334
+
+    volumes:
+      - ./docker/ss:/src
