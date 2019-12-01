@@ -72,3 +72,6 @@ services:
       restart_policy:
         condition: on-failure
 
+    depends_on:
+      - naming-server
+
