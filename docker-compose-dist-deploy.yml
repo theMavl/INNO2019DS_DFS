@@ -27,9 +27,10 @@ services:
       - mongo
 
   naming-server:
-    build: ./docker/ns
+    image: 127.0.0.1:5000/dfs-ns
+    hostname: '{{.Node.Hostname}}'
     restart: always
-    container_name: ns
+
     command: python -u dfs_ns.py
 
     environment:
