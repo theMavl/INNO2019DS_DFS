@@ -1,6 +1,25 @@
 version: '3'
 
 services:
+  naming-server:
+    build: ./docker/ns
+    restart: always
+    container_name: ns
+    image: 127.0.0.1:5000/dfs-ns
+    command: python -u dfs_ns.py
+
+    environment:
+      HOSTING: aws-many
+      PRIVATE_PORT: 33333
+      PUBLIC_PORT: 23333
+
+    ports:
+      - 23333:23333
+      - 33333:33333
+
+    volumes:
+      - ./docker/ns:/src
+
   storage-server:
     build: ./docker/ss
     # restart: always
