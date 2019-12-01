@@ -75,7 +75,7 @@ services:
     depends_on:
       - naming-server
 
-    visualizer:
+  visualizer:
     image: dockersamples/visualizer
     ports:
       - "8080:8080"
