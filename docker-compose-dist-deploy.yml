@@ -9,9 +9,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: mavl
       MONGO_INITDB_ROOT_PASSWORD: pass
       MONGO_INITDB_DATABASE: dfs
-
-    networks:
-      dfs_internal:
       
     volumes:
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
