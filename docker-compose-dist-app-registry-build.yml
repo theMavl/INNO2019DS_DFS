@@ -5,7 +5,7 @@ services:
     build: ./docker/ns
     restart: always
     container_name: ns
-    image: 127.0.0.1:5000/dfs-ns
+    image: themavl/dfs-ns
     command: python -u dfs_ns.py
 
     environment:
@@ -24,7 +24,7 @@ services:
     build: ./docker/ss
     # restart: always
     container_name: ss1
-    image: 127.0.0.1:5000/dfs-ss
+    image: themavl/dfs-ss
     
     command: python -u dfs_ss.py
 

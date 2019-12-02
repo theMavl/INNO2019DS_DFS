@@ -34,7 +34,7 @@ services:
       - mongo
 
   naming-server:
-    image: 127.0.0.1:5000/dfs-ns
+    image: themavl/dfs-ns
     hostname: '{{.Node.Hostname}}'
     restart: always
 
@@ -60,7 +60,7 @@ services:
       - mongo
 
   storage-server:
-    image: 127.0.0.1:5000/dfs-ss
+    image: themavl/dfs-ss
     hostname: '{{.Node.Hostname}}'
     ports:
       - 23334:23334
