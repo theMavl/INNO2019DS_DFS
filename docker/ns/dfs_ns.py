@@ -486,10 +486,15 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
                 channel.close()
             except Exception as e:
                 print("free:", e)
+                
+        if len(min_free) == 0:
+            response = "No storage servers online"
+        else:
+            response = "Free space: {} MB".format(min(min_free) // 2 ** 20)
 
         return dfs_pb2.GenericResponse(
             success=True,
-            response="Free space: {} MB".format(min(min_free) // 2 ** 20))
+            response=response)
 
 
 class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
