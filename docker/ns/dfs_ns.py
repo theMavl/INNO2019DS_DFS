@@ -384,8 +384,11 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
                     file_attrs = ATTRS.find_one({"_id": ObjectId(file_attr_id)})
                     if file_attrs:
                         FS.copy(path_src, path_dest)
-                        file_attrs["_id"] = ObjectId()
+                        new_id = ObjectId()
+                        file_attrs["_id"] = new_id
                         ATTRS.insert_one(file_attrs)
+                        with open(FS.getospath(path_dest), "w") as f:
+                            f.write(str(new_id))
                         success = True
                     else:
                         success = False
