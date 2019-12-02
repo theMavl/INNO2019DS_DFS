@@ -460,22 +460,21 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
 
     def free(self, request, context):
         print("{}: free".format(context.peer()))
-        min_free = 999999999
+        min_free = []
         for s in STORAGES:
             try:
                 address = STORAGES[s]["private_address"]
                 channel = grpc.insecure_channel(address)
                 stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
                 response = stub.free(Empty())
-                if response.free < min_free:
-                    min_free = response.free
+                min_free.append(response.free)
                 channel.close()
             except Exception as e:
                 print("free:", e)
 
         return dfs_pb2.GenericResponse(
             success=True,
-            response="Free space: {}".format(min_free))
+            response="Free space: {} MB".format(min(min_free) // 2 ** 20))
 
 
 class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
