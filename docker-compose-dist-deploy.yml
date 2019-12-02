@@ -2,8 +2,11 @@ version: '3'
 services:
   mongo:
     image: mongo
-    container_name: mongo
     restart: always
+
+    deploy:
+      placement:
+        constraints: [node.hostname == ip-172-31-24-157]
 
     environment:
       MONGO_INITDB_ROOT_USERNAME: mavl
@@ -16,6 +19,10 @@ services:
 
   mongo-express:
     image: mongo-express
+
+    deploy:
+      placement:
+        constraints: [node.hostname == ip-172-31-24-157]
    # restart: always
     ports:
       - 8081:8081
@@ -44,6 +51,10 @@ services:
 
     volumes:
       - ./docker/ns:/src
+
+    deploy:
+      placement:
+        constraints: [node.hostname == ip-172-31-24-157]
 
     depends_on:
       - mongo
@@ -84,5 +95,5 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     deploy:
       placement:
-        constraints: [node.role == manager]
+        constraints: [node.hostname == ip-172-31-24-157]
 
