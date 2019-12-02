@@ -97,18 +97,19 @@ def init_chunks_index():
         CHUNKS.insert_one({"_id": c, "hosts": []})
 
 
-def chunks_update_generator(chunks):
+def chunks_update_generator(chunks, command):
     for chunk in chunks:
-        response = dfs_pb2.Update(CMD=dfs_pb2.UpdateCMD.get, chunk_uuid=chunk)
+        response = dfs_pb2.Update(CMD=command, chunk_uuid=chunk)
         yield response
 
 
-def broadcast_update(chunks):
+def broadcast_update(chunks, command):
+    # dfs_pb2.UpdateCMD.get / dfs_pb2.UpdateCMD.remove
     for s in STORAGES:
         address = STORAGES[s]["private_address"]
         channel = grpc.insecure_channel(address)
         stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
-        cmd_generator = chunks_update_generator(chunks)
+        cmd_generator = chunks_update_generator(chunks, command)
         response = stub.Sync(cmd_generator)
         print(response)
         channel.close()
@@ -412,9 +413,21 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
                 try:
                     sub_fs = FS.opendir(req_path)
                     for path in sub_fs.walk.files():
-                        # Do not remove chunks. Delete them on next sync
                         file_attr_id = get_fileattr_id(sub_fs, str(path))
                         print("Looking for", file_attr_id)
+                        file_attr = ATTRS.find_one({"_id": ObjectId(file_attr_id)})
+                        unused_chunks = []
+                        if file_attr:
+                            old_chunks = file_attr["chunks"]
+                            for chunk in old_chunks:
+                                at = ATTRS.find({"chunks": chunk})
+                                if at.count() == 1:  # In case if file was copied and chunks are used in copy
+                                    CHUNKS.delete_one({"_id": chunk})
+                                    unused_chunks.append(chunk)
+
+                            dispatcher.send(chunks=unused_chunks, command=dfs_pb2.UpdateCMD.remove,
+                                            signal=SIGNAL_BROADCAST_UPDATE)
+
                         ATTRS.delete_one({"_id": ObjectId(file_attr_id)})
 
                     try:
@@ -444,6 +457,25 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
         return dfs_pb2.GenericResponse(
             success=success,
             response=response)
+
+    def free(self, request, context):
+        print("{}: free".format(context.peer()))
+        min_free = 999999999
+        for s in STORAGES:
+            try:
+                address = STORAGES[s]["private_address"]
+                channel = grpc.insecure_channel(address)
+                stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
+                response = stub.free(Empty())
+                if response.free < min_free:
+                    min_free = response.free
+                channel.close()
+            except Exception as e:
+                print("free:", e)
+
+        return dfs_pb2.GenericResponse(
+            success=True,
+            response="Free space: {}".format(min_free))
 
 
 class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
@@ -574,11 +606,15 @@ class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
 
         if file_attrs and "chunks" in file_attrs:
             old_chunks = file_attrs["chunks"]
+            unused_chunks = []
 
             for chunk in old_chunks:
                 at = ATTRS.find({"chunks": chunk})
                 if at.count() == 1:  # In case if file was copied and chunks are used in copy
                     CHUNKS.delete_one({"_id": chunk})
+                    unused_chunks.append(chunk)
+
+            dispatcher.send(chunks=unused_chunks, command=dfs_pb2.UpdateCMD.remove, signal=SIGNAL_BROADCAST_UPDATE)
 
         ATTRS.update_one({"_id": ObjectId(file_attr_id)}, {'$set': {
             'size': size,
@@ -590,7 +626,7 @@ class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
         for chunk in chunks:
             CHUNKS.insert_one({"_id": chunk, "hosts": [ss_uuid]})
 
-        dispatcher.send(chunks=chunks, signal=SIGNAL_BROADCAST_UPDATE)
+        dispatcher.send(chunks=chunks, command=dfs_pb2.UpdateCMD.get, signal=SIGNAL_BROADCAST_UPDATE)
 
         return dfs_pb2.GenericResponse(success=True, response="OK")
 

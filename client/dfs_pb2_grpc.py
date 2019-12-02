@@ -80,6 +80,11 @@ class DFS_NamingServerStub(object):
         request_serializer=dfs__pb2.Path2.SerializeToString,
         response_deserializer=dfs__pb2.GenericResponse.FromString,
         )
+    self.free = channel.unary_unary(
+        '/DFS_NamingServer/free',
+        request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+        response_deserializer=dfs__pb2.GenericResponse.FromString,
+        )
 
 
 class DFS_NamingServerServicer(object):
@@ -177,6 +182,13 @@ class DFS_NamingServerServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def free(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_DFS_NamingServerServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -243,6 +255,11 @@ def add_DFS_NamingServerServicer_to_server(servicer, server):
       'rename': grpc.unary_unary_rpc_method_handler(
           servicer.rename,
           request_deserializer=dfs__pb2.Path2.FromString,
+          response_serializer=dfs__pb2.GenericResponse.SerializeToString,
+      ),
+      'free': grpc.unary_unary_rpc_method_handler(
+          servicer.free,
+          request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
           response_serializer=dfs__pb2.GenericResponse.SerializeToString,
       ),
   }
@@ -518,6 +535,11 @@ class DFS_SSPrivateStub(object):
         request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
         response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
         )
+    self.free = channel.unary_unary(
+        '/DFS_SSPrivate/free',
+        request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+        response_deserializer=dfs__pb2.FreeSpaceInfo.FromString,
+        )
 
 
 class DFS_SSPrivateServicer(object):
@@ -552,6 +574,13 @@ class DFS_SSPrivateServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def free(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_DFS_SSPrivateServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -574,6 +603,11 @@ def add_DFS_SSPrivateServicer_to_server(servicer, server):
           servicer.Nuke,
           request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
           response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+      ),
+      'free': grpc.unary_unary_rpc_method_handler(
+          servicer.free,
+          request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+          response_serializer=dfs__pb2.FreeSpaceInfo.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

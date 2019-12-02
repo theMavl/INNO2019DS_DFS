@@ -84,6 +84,7 @@ class Session:
             "mv": self.mv_handler,
             "rm": self.rm_handler,
             "write": self.write_handler,
+            "free": self.free_handler,
             "UNKNOWN": self.unknown_handler
         }
 
@@ -241,6 +242,10 @@ class Session:
         for res in response:
             print(res)
 
+    def free_handler(self, args):
+        response = self.stub.free(Empty())
+        print(response.response)
+
     def cp_handler(self, args):
         if len(args) < 2:
             print("Usage: cp [SOURCE] [DESTINATION]")
@@ -272,6 +277,9 @@ class Session:
 
         response = self.stub.init(Empty())
         if not response.success:
+            print(response.response)
+        else:
+            response = self.stub.free(Empty())
             print(response.response)
 
     def rm_handler(self, args):

@@ -22,7 +22,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\tdfs.proto\x1a\x1bgoogle/protobuf/empty.proto\"&\n\x0eGenericRequest\x12\x14\n\x0crequest_data\x18\x01 \x01(\t\"%\n\x04Path\x12\x0b\n\x03\x63wd\x18\x01 \x01(\t\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\"/\n\x05Path2\x12\x0b\n\x03\x63wd\x18\x01 \x01(\t\x12\x0b\n\x03src\x18\x02 \x01(\t\x12\x0c\n\x04\x64\x65st\x18\x03 \x01(\t\"F\n\rSyncChunkUUID\x12\x0f\n\x07ss_uuid\x18\x01 \x01(\t\x12\x10\n\x08\x63hunks_n\x18\x02 \x01(\x04\x12\x12\n\nchunk_uuid\x18\x03 \x01(\t\"\x1f\n\tChunkUUID\x12\x12\n\nchunk_uuid\x18\x01 \x01(\t\"4\n\x0fGenericResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x10\n\x08response\x18\x02 \x01(\t\"Q\n\tSSSummary\x12\"\n\x08response\x18\x01 \x01(\x0b\x32\x10.GenericResponse\x12\x12\n\nip_address\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\r\"o\n\tFileChunk\x12\"\n\x08response\x18\x01 \x01(\x0b\x32\x10.GenericResponse\x12\x0f\n\x07\x63hunk_n\x18\x02 \x01(\r\x12\x12\n\nchunk_uuid\x18\x03 \x01(\t\x12\x19\n\x05hosts\x18\x04 \x03(\x0b\x32\n.SSSummary\">\n\x05\x43hunk\x12\x0f\n\x07\x63hunk_n\x18\x01 \x01(\x04\x12\x13\n\x04path\x18\x02 \x01(\x0b\x32\x05.Path\x12\x0f\n\x07\x43ontent\x18\x03 \x01(\x0c\"@\n\x0cUploadStatus\x12\x0f\n\x07Message\x18\x01 \x01(\t\x12\x1f\n\x04\x43ode\x18\x02 \x01(\x0e\x32\x11.UploadStatusCode\"D\n\x06Update\x12\x17\n\x03\x43MD\x18\x01 \x01(\x0e\x32\n.UpdateCMD\x12\x12\n\nchunk_uuid\x18\x02 \x01(\t\x12\r\n\x05hosts\x18\x03 \x03(\t\"b\n\x0bSSLoginInfo\x12\x0f\n\x07ss_uuid\x18\x01 \x01(\t\x12\x17\n\x0f\x65xposed_address\x18\x02 \x01(\t\x12\x17\n\x0fprivate_address\x18\x03 \x01(\t\x12\x10\n\x08\x63hunks_n\x18\x04 \x01(\x04\"]\n\x10SSFileUpdateInfo\x12\x0f\n\x07ss_uuid\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0c\n\x04size\x18\x03 \x01(\x04\x12\x0c\n\x04hash\x18\x04 \x01(\t\x12\x0e\n\x06\x63hunks\x18\x05 \x03(\t\"N\n\x0bTouchResult\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0e\n\x06\x65xists\x18\x02 \x01(\x08\x12\x0c\n\x04hash\x18\x03 \x01(\t\x12\x10\n\x08response\x18\x04 \x01(\t\"\x1d\n\nSSBeatInfo\x12\x0f\n\x07ss_uuid\x18\x01 \x01(\t\"[\n\x0eSSGotWriteInfo\x12\x0f\n\x07ss_uuid\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0c\n\x04size\x18\x03 \x01(\x04\x12\x0c\n\x04hash\x18\x04 \x01(\t\x12\x0e\n\x06\x63hunks\x18\x05 \x03(\t*3\n\x10UploadStatusCode\x12\x0b\n\x07Unknown\x10\x00\x12\x06\n\x02Ok\x10\x01\x12\n\n\x06\x46\x61iled\x10\x02*3\n\tUpdateCMD\x12\t\n\x05\x45rror\x10\x00\x12\x06\n\x02OK\x10\x01\x12\x07\n\x03get\x10\x02\x12\n\n\x06remove\x10\x03\x32\xdd\x03\n\x10\x44\x46S_NamingServer\x12\x30\n\x04init\x12\x16.google.protobuf.Empty\x1a\x10.GenericResponse\x12\x1d\n\x02ls\x12\x05.Path\x1a\x10.GenericResponse\x12*\n\x02sl\x12\x16.google.protobuf.Empty\x1a\n.SSSummary0\x01\x12\x1d\n\x02\x63\x64\x12\x05.Path\x1a\x10.GenericResponse\x12\x1d\n\x02rm\x12\x05.Path\x1a\x10.GenericResponse\x12\x1e\n\x02\x63p\x12\x06.Path2\x1a\x10.GenericResponse\x12\x1e\n\x02mv\x12\x06.Path2\x1a\x10.GenericResponse\x12 \n\x05which\x12\x05.Path\x1a\x10.GenericResponse\x12\'\n\x0bwhich_chunk\x12\n.ChunkUUID\x1a\n.SSSummary0\x01\x12\x1f\n\x04info\x12\x05.Path\x1a\x10.GenericResponse\x12 \n\x05mkdir\x12\x05.Path\x1a\x10.GenericResponse\x12\x1c\n\x05touch\x12\x05.Path\x1a\x0c.TouchResult\x12\"\n\x06rename\x12\x06.Path2\x1a\x10.GenericResponse2\xed\x02\n\rDFS_NSPrivate\x12\x1c\n\x05touch\x12\x05.Path\x1a\x0c.TouchResult\x12\'\n\x0bwhich_chunk\x12\n.ChunkUUID\x1a\n.SSSummary0\x01\x12)\n\x07SSLogin\x12\x0c.SSLoginInfo\x1a\x10.GenericResponse\x12%\n\x06SSSync\x12\x0e.SyncChunkUUID\x1a\x07.Update(\x01\x30\x01\x12\x34\n\nSSGotChunk\x12\x0e.SyncChunkUUID\x1a\x16.google.protobuf.Empty\x12\x33\n\x0cSSFileUpdate\x12\x11.SSFileUpdateInfo\x1a\x10.GenericResponse\x12\'\n\x06SSBeat\x12\x0b.SSBeatInfo\x1a\x10.GenericResponse\x12/\n\nSSGotWrite\x12\x0f.SSGotWriteInfo\x1a\x10.GenericResponse2z\n\x11\x44\x46S_StorageServer\x12#\n\x03has\x12\n.ChunkUUID\x1a\x10.GenericResponse\x12\x1b\n\x03get\x12\n.ChunkUUID\x1a\x06.Chunk0\x01\x12#\n\x05write\x12\x06.Chunk\x1a\x10.GenericResponse(\x01\x32\xb4\x01\n\rDFS_SSPrivate\x12)\n\x04Sync\x12\x07.Update\x1a\x16.google.protobuf.Empty(\x01\x12\x1b\n\x03get\x12\n.ChunkUUID\x1a\x06.Chunk0\x01\x12#\n\x03has\x12\n.ChunkUUID\x1a\x10.GenericResponse\x12\x36\n\x04Nuke\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Emptyb\x06proto3')
+  serialized_pb=_b('\n\tdfs.proto\x1a\x1bgoogle/protobuf/empty.proto\"&\n\x0eGenericRequest\x12\x14\n\x0crequest_data\x18\x01 \x01(\t\"%\n\x04Path\x12\x0b\n\x03\x63wd\x18\x01 \x01(\t\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\"/\n\x05Path2\x12\x0b\n\x03\x63wd\x18\x01 \x01(\t\x12\x0b\n\x03src\x18\x02 \x01(\t\x12\x0c\n\x04\x64\x65st\x18\x03 \x01(\t\"F\n\rSyncChunkUUID\x12\x0f\n\x07ss_uuid\x18\x01 \x01(\t\x12\x10\n\x08\x63hunks_n\x18\x02 \x01(\x04\x12\x12\n\nchunk_uuid\x18\x03 \x01(\t\"\x1f\n\tChunkUUID\x12\x12\n\nchunk_uuid\x18\x01 \x01(\t\"4\n\x0fGenericResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x10\n\x08response\x18\x02 \x01(\t\"Q\n\tSSSummary\x12\"\n\x08response\x18\x01 \x01(\x0b\x32\x10.GenericResponse\x12\x12\n\nip_address\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\r\"o\n\tFileChunk\x12\"\n\x08response\x18\x01 \x01(\x0b\x32\x10.GenericResponse\x12\x0f\n\x07\x63hunk_n\x18\x02 \x01(\r\x12\x12\n\nchunk_uuid\x18\x03 \x01(\t\x12\x19\n\x05hosts\x18\x04 \x03(\x0b\x32\n.SSSummary\">\n\x05\x43hunk\x12\x0f\n\x07\x63hunk_n\x18\x01 \x01(\x04\x12\x13\n\x04path\x18\x02 \x01(\x0b\x32\x05.Path\x12\x0f\n\x07\x43ontent\x18\x03 \x01(\x0c\"@\n\x0cUploadStatus\x12\x0f\n\x07Message\x18\x01 \x01(\t\x12\x1f\n\x04\x43ode\x18\x02 \x01(\x0e\x32\x11.UploadStatusCode\"D\n\x06Update\x12\x17\n\x03\x43MD\x18\x01 \x01(\x0e\x32\n.UpdateCMD\x12\x12\n\nchunk_uuid\x18\x02 \x01(\t\x12\r\n\x05hosts\x18\x03 \x03(\t\"b\n\x0bSSLoginInfo\x12\x0f\n\x07ss_uuid\x18\x01 \x01(\t\x12\x17\n\x0f\x65xposed_address\x18\x02 \x01(\t\x12\x17\n\x0fprivate_address\x18\x03 \x01(\t\x12\x10\n\x08\x63hunks_n\x18\x04 \x01(\x04\"]\n\x10SSFileUpdateInfo\x12\x0f\n\x07ss_uuid\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0c\n\x04size\x18\x03 \x01(\x04\x12\x0c\n\x04hash\x18\x04 \x01(\t\x12\x0e\n\x06\x63hunks\x18\x05 \x03(\t\"N\n\x0bTouchResult\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0e\n\x06\x65xists\x18\x02 \x01(\x08\x12\x0c\n\x04hash\x18\x03 \x01(\t\x12\x10\n\x08response\x18\x04 \x01(\t\"\x1d\n\nSSBeatInfo\x12\x0f\n\x07ss_uuid\x18\x01 \x01(\t\"[\n\x0eSSGotWriteInfo\x12\x0f\n\x07ss_uuid\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0c\n\x04size\x18\x03 \x01(\x04\x12\x0c\n\x04hash\x18\x04 \x01(\t\x12\x0e\n\x06\x63hunks\x18\x05 \x03(\t\":\n\rFreeSpaceInfo\x12\r\n\x05total\x18\x01 \x01(\x04\x12\x0c\n\x04used\x18\x02 \x01(\x04\x12\x0c\n\x04\x66ree\x18\x03 \x01(\x04*3\n\x10UploadStatusCode\x12\x0b\n\x07Unknown\x10\x00\x12\x06\n\x02Ok\x10\x01\x12\n\n\x06\x46\x61iled\x10\x02*3\n\tUpdateCMD\x12\t\n\x05\x45rror\x10\x00\x12\x06\n\x02OK\x10\x01\x12\x07\n\x03get\x10\x02\x12\n\n\x06remove\x10\x03\x32\x8f\x04\n\x10\x44\x46S_NamingServer\x12\x30\n\x04init\x12\x16.google.protobuf.Empty\x1a\x10.GenericResponse\x12\x1d\n\x02ls\x12\x05.Path\x1a\x10.GenericResponse\x12*\n\x02sl\x12\x16.google.protobuf.Empty\x1a\n.SSSummary0\x01\x12\x1d\n\x02\x63\x64\x12\x05.Path\x1a\x10.GenericResponse\x12\x1d\n\x02rm\x12\x05.Path\x1a\x10.GenericResponse\x12\x1e\n\x02\x63p\x12\x06.Path2\x1a\x10.GenericResponse\x12\x1e\n\x02mv\x12\x06.Path2\x1a\x10.GenericResponse\x12 \n\x05which\x12\x05.Path\x1a\x10.GenericResponse\x12\'\n\x0bwhich_chunk\x12\n.ChunkUUID\x1a\n.SSSummary0\x01\x12\x1f\n\x04info\x12\x05.Path\x1a\x10.GenericResponse\x12 \n\x05mkdir\x12\x05.Path\x1a\x10.GenericResponse\x12\x1c\n\x05touch\x12\x05.Path\x1a\x0c.TouchResult\x12\"\n\x06rename\x12\x06.Path2\x1a\x10.GenericResponse\x12\x30\n\x04\x66ree\x12\x16.google.protobuf.Empty\x1a\x10.GenericResponse2\xed\x02\n\rDFS_NSPrivate\x12\x1c\n\x05touch\x12\x05.Path\x1a\x0c.TouchResult\x12\'\n\x0bwhich_chunk\x12\n.ChunkUUID\x1a\n.SSSummary0\x01\x12)\n\x07SSLogin\x12\x0c.SSLoginInfo\x1a\x10.GenericResponse\x12%\n\x06SSSync\x12\x0e.SyncChunkUUID\x1a\x07.Update(\x01\x30\x01\x12\x34\n\nSSGotChunk\x12\x0e.SyncChunkUUID\x1a\x16.google.protobuf.Empty\x12\x33\n\x0cSSFileUpdate\x12\x11.SSFileUpdateInfo\x1a\x10.GenericResponse\x12\'\n\x06SSBeat\x12\x0b.SSBeatInfo\x1a\x10.GenericResponse\x12/\n\nSSGotWrite\x12\x0f.SSGotWriteInfo\x1a\x10.GenericResponse2z\n\x11\x44\x46S_StorageServer\x12#\n\x03has\x12\n.ChunkUUID\x1a\x10.GenericResponse\x12\x1b\n\x03get\x12\n.ChunkUUID\x1a\x06.Chunk0\x01\x12#\n\x05write\x12\x06.Chunk\x1a\x10.GenericResponse(\x01\x32\xe4\x01\n\rDFS_SSPrivate\x12)\n\x04Sync\x12\x07.Update\x1a\x16.google.protobuf.Empty(\x01\x12\x1b\n\x03get\x12\n.ChunkUUID\x1a\x06.Chunk0\x01\x12#\n\x03has\x12\n.ChunkUUID\x1a\x10.GenericResponse\x12\x36\n\x04Nuke\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12.\n\x04\x66ree\x12\x16.google.protobuf.Empty\x1a\x0e.FreeSpaceInfob\x06proto3')
   ,
   dependencies=[google_dot_protobuf_dot_empty__pb2.DESCRIPTOR,])
 
@@ -47,8 +47,8 @@ _UPLOADSTATUSCODE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1124,
-  serialized_end=1175,
+  serialized_start=1184,
+  serialized_end=1235,
 )
 _sym_db.RegisterEnumDescriptor(_UPLOADSTATUSCODE)
 
@@ -78,8 +78,8 @@ _UPDATECMD = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1177,
-  serialized_end=1228,
+  serialized_start=1237,
+  serialized_end=1288,
 )
 _sym_db.RegisterEnumDescriptor(_UPDATECMD)
 
@@ -799,6 +799,51 @@ _SSGOTWRITEINFO = _descriptor.Descriptor(
   serialized_end=1122,
 )
 
+
+_FREESPACEINFO = _descriptor.Descriptor(
+  name='FreeSpaceInfo',
+  full_name='FreeSpaceInfo',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='total', full_name='FreeSpaceInfo.total', index=0,
+      number=1, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='used', full_name='FreeSpaceInfo.used', index=1,
+      number=2, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='free', full_name='FreeSpaceInfo.free', index=2,
+      number=3, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1124,
+  serialized_end=1182,
+)
+
 _SSSUMMARY.fields_by_name['response'].message_type = _GENERICRESPONSE
 _FILECHUNK.fields_by_name['response'].message_type = _GENERICRESPONSE
 _FILECHUNK.fields_by_name['hosts'].message_type = _SSSUMMARY
@@ -821,6 +866,7 @@ DESCRIPTOR.message_types_by_name['SSFileUpdateInfo'] = _SSFILEUPDATEINFO
 DESCRIPTOR.message_types_by_name['TouchResult'] = _TOUCHRESULT
 DESCRIPTOR.message_types_by_name['SSBeatInfo'] = _SSBEATINFO
 DESCRIPTOR.message_types_by_name['SSGotWriteInfo'] = _SSGOTWRITEINFO
+DESCRIPTOR.message_types_by_name['FreeSpaceInfo'] = _FREESPACEINFO
 DESCRIPTOR.enum_types_by_name['UploadStatusCode'] = _UPLOADSTATUSCODE
 DESCRIPTOR.enum_types_by_name['UpdateCMD'] = _UPDATECMD
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -937,6 +983,13 @@ SSGotWriteInfo = _reflection.GeneratedProtocolMessageType('SSGotWriteInfo', (_me
   })
 _sym_db.RegisterMessage(SSGotWriteInfo)
 
+FreeSpaceInfo = _reflection.GeneratedProtocolMessageType('FreeSpaceInfo', (_message.Message,), {
+  'DESCRIPTOR' : _FREESPACEINFO,
+  '__module__' : 'dfs_pb2'
+  # @@protoc_insertion_point(class_scope:FreeSpaceInfo)
+  })
+_sym_db.RegisterMessage(FreeSpaceInfo)
+
 
 
 _DFS_NAMINGSERVER = _descriptor.ServiceDescriptor(
@@ -945,8 +998,8 @@ _DFS_NAMINGSERVER = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=1231,
-  serialized_end=1708,
+  serialized_start=1291,
+  serialized_end=1818,
   methods=[
   _descriptor.MethodDescriptor(
     name='init',
@@ -1065,6 +1118,15 @@ _DFS_NAMINGSERVER = _descriptor.ServiceDescriptor(
     output_type=_GENERICRESPONSE,
     serialized_options=None,
   ),
+  _descriptor.MethodDescriptor(
+    name='free',
+    full_name='DFS_NamingServer.free',
+    index=13,
+    containing_service=None,
+    input_type=google_dot_protobuf_dot_empty__pb2._EMPTY,
+    output_type=_GENERICRESPONSE,
+    serialized_options=None,
+  ),
 ])
 _sym_db.RegisterServiceDescriptor(_DFS_NAMINGSERVER)
 
@@ -1077,8 +1139,8 @@ _DFS_NSPRIVATE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=1,
   serialized_options=None,
-  serialized_start=1711,
-  serialized_end=2076,
+  serialized_start=1821,
+  serialized_end=2186,
   methods=[
   _descriptor.MethodDescriptor(
     name='touch',
@@ -1164,8 +1226,8 @@ _DFS_STORAGESERVER = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=2,
   serialized_options=None,
-  serialized_start=2078,
-  serialized_end=2200,
+  serialized_start=2188,
+  serialized_end=2310,
   methods=[
   _descriptor.MethodDescriptor(
     name='has',
@@ -1206,8 +1268,8 @@ _DFS_SSPRIVATE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=3,
   serialized_options=None,
-  serialized_start=2203,
-  serialized_end=2383,
+  serialized_start=2313,
+  serialized_end=2541,
   methods=[
   _descriptor.MethodDescriptor(
     name='Sync',
@@ -1243,6 +1305,15 @@ _DFS_SSPRIVATE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=google_dot_protobuf_dot_empty__pb2._EMPTY,
     output_type=google_dot_protobuf_dot_empty__pb2._EMPTY,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='free',
+    full_name='DFS_SSPrivate.free',
+    index=4,
+    containing_service=None,
+    input_type=google_dot_protobuf_dot_empty__pb2._EMPTY,
+    output_type=_FREESPACEINFO,
     serialized_options=None,
   ),
 ])

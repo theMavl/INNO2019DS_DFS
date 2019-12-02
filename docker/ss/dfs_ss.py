@@ -12,7 +12,7 @@ import os
 import hashlib
 import json
 import urllib.request
-
+import shutil
 hosting = os.environ.get('HOSTING', "localhost")
 
 """
@@ -325,6 +325,11 @@ class DFS_SSPrivateServicer(dfs_pb2_grpc.DFS_SSPrivateServicer):
             print("Chunk {} nuked".format(path))
 
         return Empty()
+
+    def free(self, request, context):
+        print("{}: free".format(context.peer()))
+        total, used, free = shutil.disk_usage("./storage")
+        return dfs_pb2.FreeSpaceInfo(total=total, used=used, free=free)
 
 
 def main():
