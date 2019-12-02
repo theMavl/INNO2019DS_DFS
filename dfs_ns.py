@@ -138,8 +138,16 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
         print("{}: init".format(context.peer()))
         CHUNKS.drop()
         ATTRS.drop()
-        shutil.rmtree('./fs')
-        os.mkdir('./fs')
+        # shutil.rmtree('./fs')
+        # os.mkdir('./fs')
+
+        for filename in os.listdir("./fs"):
+            file_path = os.path.join("./fs", filename)
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+
         dispatcher.send(signal=SIGNAL_BROADCAST_NUKE)
         response = dfs_pb2.GenericResponse(
             success=True,
