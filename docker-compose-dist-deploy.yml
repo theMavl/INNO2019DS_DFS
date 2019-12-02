@@ -6,7 +6,7 @@ services:
 
     deploy:
       placement:
-        constraints: [node.hostname == ip-172-31-24-157]
+        constraints: [node.hostname == ${NS_HOSTNAME}]
 
     environment:
       MONGO_INITDB_ROOT_USERNAME: mavl
@@ -22,7 +22,7 @@ services:
 
     deploy:
       placement:
-        constraints: [node.hostname == ip-172-31-24-157]
+        constraints: [node.hostname == ${NS_HOSTNAME}]
    # restart: always
     ports:
       - 8081:8081
@@ -42,19 +42,19 @@ services:
 
     environment:
       HOSTING: aws-many
-      PRIVATE_PORT: 33333
-      PUBLIC_PORT: 23333
+      PRIVATE_PORT: ${NS_PRIVATE_PORT}
+      PUBLIC_PORT: ${NS_PUBLIC_PORT}
 
     ports:
-      - 23333:23333
-      - 33333:33333
+      - ${NS_PUBLIC_PORT}:${NS_PUBLIC_PORT}
+      - ${NS_PRIVATE_PORT}:${NS_PRIVATE_PORT}
 
     volumes:
       - /var/dfs/fs:/src/fs
 
     deploy:
       placement:
-        constraints: [node.hostname == ip-172-31-24-157]
+        constraints: [node.hostname == ${NS_HOSTNAME}]
 
     depends_on:
       - mongo
@@ -63,8 +63,8 @@ services:
     image: themavl/dfs-ss
     hostname: '{{.Node.Hostname}}'
     ports:
-      - 23334:23334
-      - 33334:33334
+      - ${SS_PUBLIC_PORT}:${SS_PUBLIC_PORT}
+      - ${SS_PRIVATE_PORT}:${SS_PRIVATE_PORT}
     
     command: python -u dfs_ss.py
 
@@ -74,9 +74,9 @@ services:
 
     environment:
       HOSTING: aws-many
-      PUBLIC_PORT: 23334
-      PRIVATE_PORT: 33334
-      NS_PRIVATE_ADDRESS: 172.31.24.157:33333
+      PUBLIC_PORT: ${SS_PUBLIC_PORT}
+      PRIVATE_PORT: ${SS_PRIVATE_PORT}
+      NS_PRIVATE_ADDRESS: ${NS_PRIVATE_ADDRESS}
 
     deploy:
       mode: global
@@ -96,5 +96,5 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     deploy:
       placement:
-        constraints: [node.hostname == ip-172-31-24-157]
+        constraints: [node.hostname == ${NS_HOSTNAME}]
 
