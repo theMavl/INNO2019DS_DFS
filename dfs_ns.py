@@ -453,6 +453,13 @@ class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
             test_channel.close()
             print("Destination {} alive".format(priv_addr))
             response = dfs_pb2.GenericResponse(success=True, response=str(PRIVATE_ADDRESS))
+
+            # If connected with the same uuid but different ip, delete everything related to previous ip
+            if request.ss_uuid in STORAGES:
+                chunks = CHUNKS.find({"hosts": request.ss_uuid})
+                for chunk in chunks:
+                    CHUNKS.update_one(chunk, {"$pull": {"hosts": request.ss_uuid}})
+
             PENDING_SYNC_STORAGES.update({request.ss_uuid: {"address": addr, "private_address": priv_addr}})
             print("Storage {} ({}) added to pending sync list".format(addr, request.ss_uuid))
 
