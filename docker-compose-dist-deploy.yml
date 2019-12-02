@@ -15,7 +15,7 @@ services:
       
     volumes:
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      # - ./mongo-volume:/data/db
+      - /var/dfs/mongo-volume:/data/db
 
   mongo-express:
     image: mongo-express
