@@ -6,12 +6,13 @@ from google.protobuf.empty_pb2 import Empty
 import os
 import json
 import hashlib
+from pprint import pprint
 import random
 from multiprocessing import Pool
+import sys
 
-SERVER_ADDRESS = "localhost:23333"
-# SERVER_ADDRESS = "localhost:23334"
-CLIENT_ID = 1
+# SERVER_ADDRESS = "3.248.214.33:23333"
+
 CHUNK_SIZE = 1024 * 1024
 
 
@@ -179,7 +180,11 @@ class Session:
 
         request = dfs_pb2.Path(cwd=self.cwd, filename=filename)
         response = self.stub.info(request)
-        print(response.response)
+        if response.success:
+            response_di = json.loads(response.response)
+            pprint(response_di)
+        else:
+            print(response.response)
 
     def touch_handler(self, path):
         filename = "".join(path)
@@ -211,10 +216,10 @@ class Session:
 
         request = dfs_pb2.Path(cwd=self.cwd, filename=filename)
         response = self.stub.which(request)
-        print(response)
+        # print(response)
         if response.success:
             chunks_json = json.loads(response.response)
-            print(chunks_json)
+            pprint(chunks_json)
 
     def cd_handler(self, folder):
         folder = "".join(folder)
@@ -350,14 +355,12 @@ def get_file_chunks(cwd, filename, fake_path):
 
 
 def main():
-    session = Session(SERVER_ADDRESS)
+    if len(sys.argv) < 2:
+        print("NS address is missing")
+        exit(1)
 
-    # channel = grpc.insecure_channel("localhost:23334")
-    # stub = dfs_pb2_grpc.DFS_StorageServerStub(channel)
-    #
-    # chunks_generator = get_file_chunks("KEK44", "KEK44")
-    # response = stub.write(chunks_generator)
-    # print(response)
+    server_address = sys.argv[1]
+    session = Session(server_address)
 
     while True:
         cmd = input("[DFS {}]$ ".format(session.cwd))
