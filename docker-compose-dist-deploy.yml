@@ -49,8 +49,8 @@ services:
       - 23333:23333
       - 33333:33333
 
-    volumes:
-      - ./docker/ns:/src
+    # volumes:
+    #   - ./docker/ns:/src
 
     deploy:
       placement:
@@ -68,8 +68,8 @@ services:
     
     command: python -u dfs_ss.py
 
-    volumes:
-      - ./docker/ss:/src
+    # volumes:
+    #   - ./docker/ss:/src
 
     environment:
       HOSTING: aws-many
