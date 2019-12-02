@@ -46,8 +46,8 @@ services:
       PUBLIC_PORT: $NS_PUBLIC_PORT
 
     ports:
-      - $NS_PUBLIC_PORT:$NS_PUBLIC_PORT
-      - $NS_PRIVATE_PORT:$NS_PRIVATE_PORT
+      - "${NS_PUBLIC_PORT}:${NS_PUBLIC_PORT}"
+      - "${NS_PRIVATE_PORT}:${NS_PRIVATE_PORT}"
 
     volumes:
       - /var/dfs/fs:/src/fs
@@ -63,8 +63,8 @@ services:
     image: themavl/dfs-ss
     hostname: '{{.Node.Hostname}}'
     ports:
-      - $SS_PUBLIC_PORT:$SS_PUBLIC_PORT
-      - $SS_PRIVATE_PORT:$SS_PRIVATE_PORT
+      - "${SS_PUBLIC_PORT}:${SS_PUBLIC_PORT}"
+      - "${SS_PRIVATE_PORT}:${SS_PRIVATE_PORT}"
     
     command: python -u dfs_ss.py
 
