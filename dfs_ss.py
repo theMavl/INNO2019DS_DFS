@@ -50,17 +50,17 @@ else:
 
 NS_PRIVATE_ADDRESS = os.environ.get('NS_PRIVATE_ADDRESS', '127.0.0.1:33333')
 
-if os.path.exists("/src/SS_UUID"):
-    with open("/src/SS_UUID", "r") as f:
+if os.path.exists("./SS_UUID"):
+    with open("./SS_UUID", "r") as f:
         buf = f.read()
         SS_UUID = buf.strip()
 else:
     SS_UUID = str(uuid4())
-    with open("/src/SS_UUID", "w+") as f:
+    with open("./SS_UUID", "w+") as f:
         f.write(SS_UUID)
 
-if not os.path.exists("/src/storage"):
-    os.mkdir("/src/storage")
+if not os.path.exists("./storage"):
+    os.mkdir("./storage")
 
 FS = fs.open_fs("storage")
 
