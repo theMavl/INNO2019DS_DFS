@@ -425,6 +425,7 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
                                     CHUNKS.delete_one({"_id": chunk})
                                     unused_chunks.append(chunk)
 
+                            print("Chunks to be deleted:", unused_chunks)
                             dispatcher.send(chunks=unused_chunks, command=dfs_pb2.UpdateCMD.remove,
                                             signal=SIGNAL_BROADCAST_UPDATE)
 
@@ -447,6 +448,20 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
             else:
                 file_attr_id = get_fileattr_id(FS, str(req_path))
                 print("Looking for", file_attr_id)
+                file_attr = ATTRS.find_one({"_id": ObjectId(file_attr_id)})
+                unused_chunks = []
+                if file_attr:
+                    old_chunks = file_attr["chunks"]
+                    for chunk in old_chunks:
+                        at = ATTRS.find({"chunks": chunk})
+                        if at.count() == 1:  # In case if file was copied and chunks are used in copy
+                            CHUNKS.delete_one({"_id": chunk})
+                            unused_chunks.append(chunk)
+
+                    print("Chunks to be deleted:", unused_chunks)
+                    dispatcher.send(chunks=unused_chunks, command=dfs_pb2.UpdateCMD.remove,
+                                    signal=SIGNAL_BROADCAST_UPDATE)
+
                 ATTRS.delete_one({"_id": ObjectId(file_attr_id)})
                 FS.remove(req_path)
                 success = True
