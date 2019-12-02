@@ -18,7 +18,7 @@ services:
       - 33333:33333
 
     volumes:
-      - ./docker/ns:/src
+      - /var/dfs/fs:/src/fs
 
   storage-server:
     build: ./docker/ss
@@ -39,4 +39,5 @@ services:
       - 33334:33334
 
     volumes:
-      - ./docker/ss:/src
+      - /var/dfs/storage:/src/storage
+      - /var/dfs/config:/src/config
