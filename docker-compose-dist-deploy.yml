@@ -17,9 +17,6 @@ services:
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       # - ./mongo-volume:/data/db
 
-    networks:
-      dfs_internal:
-
   mongo-express:
     image: mongo-express
 
@@ -35,9 +32,6 @@ services:
 
     depends_on:
       - mongo
-
-    networks:
-      dfs_internal:
 
   naming-server:
     image: 127.0.0.1:5000/dfs-ns
@@ -64,9 +58,6 @@ services:
 
     depends_on:
       - mongo
-
-    networks:
-      dfs_internal:
 
   storage-server:
     image: 127.0.0.1:5000/dfs-ss
@@ -95,9 +86,6 @@ services:
     depends_on:
       - naming-server
 
-    networks:
-      dfs_internal:
-
   visualizer:
     image: dockersamples/visualizer
     ports:
@@ -109,13 +97,3 @@ services:
       placement:
         constraints: [node.hostname == ip-172-31-24-157]
 
-    networks:
-      dfs_internal:
-
-
-networks:
-    dfs_internal:
-        ipam:
-            driver: default
-            config:
-                - subnet: 192.168.0.0/16
