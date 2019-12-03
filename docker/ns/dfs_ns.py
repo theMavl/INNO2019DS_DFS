@@ -111,7 +111,7 @@ def broadcast_update(chunks, command):
             channel = grpc.insecure_channel(address)
             stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
             cmd_generator = chunks_update_generator(chunks, command)
-            response = stub.Sync(cmd_generator)
+            response = stub.Sync(cmd_generator, timeout=5)
             print(response)
             channel.close()
         except Exception as e:
@@ -123,7 +123,7 @@ def broadcast_nuke():
         address = STORAGES[s]["private_address"]
         try:
             channel = grpc.insecure_channel(address)
-            stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
+            stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel, timeout=5)
             response = stub.Nuke(Empty())
             channel.close()
         except Exception as e:
