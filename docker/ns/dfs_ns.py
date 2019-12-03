@@ -107,21 +107,27 @@ def broadcast_update(chunks, command):
     # dfs_pb2.UpdateCMD.get / dfs_pb2.UpdateCMD.remove
     for s in STORAGES:
         address = STORAGES[s]["private_address"]
-        channel = grpc.insecure_channel(address)
-        stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
-        cmd_generator = chunks_update_generator(chunks, command)
-        response = stub.Sync(cmd_generator)
-        print(response)
-        channel.close()
+        try:
+            channel = grpc.insecure_channel(address)
+            stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
+            cmd_generator = chunks_update_generator(chunks, command)
+            response = stub.Sync(cmd_generator)
+            print(response)
+            channel.close()
+        except Exception as e:
+            print("Sync:", e)
 
 
 def broadcast_nuke():
     for s in STORAGES:
         address = STORAGES[s]["private_address"]
-        channel = grpc.insecure_channel(address)
-        stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
-        response = stub.Nuke(Empty())
-        channel.close()
+        try:
+            channel = grpc.insecure_channel(address)
+            stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
+            response = stub.Nuke(Empty())
+            channel.close()
+        except Exception as e:
+            print("nuke:", e)
 
 
 def get_fileattr_id(filesystem, fake_path):
@@ -486,7 +492,7 @@ class DFS_NamingServerServicer(dfs_pb2_grpc.DFS_NamingServerServicer):
                 channel.close()
             except Exception as e:
                 print("free:", e)
-                
+
         if len(min_free) == 0:
             response = "No storage servers online"
         else:
