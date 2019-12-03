@@ -123,8 +123,8 @@ def broadcast_nuke():
         address = STORAGES[s]["private_address"]
         try:
             channel = grpc.insecure_channel(address)
-            stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel, timeout=5)
-            response = stub.Nuke(Empty())
+            stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
+            response = stub.Nuke(Empty(), timeout=5)
             channel.close()
         except Exception as e:
             print("nuke:", e)

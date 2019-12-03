@@ -33,7 +33,7 @@ def get_chunk(chunk_UUID, hosts):
         try:
             channel = grpc.insecure_channel(host)
             stub = dfs_pb2_grpc.DFS_StorageServerStub(channel)
-            response = stub.has(dfs_pb2.ChunkUUID(chunk_uuid=chunk_UUID, timeout=5))
+            response = stub.has(dfs_pb2.ChunkUUID(chunk_uuid=chunk_UUID), timeout=5)
             if response.success:
                 print("Downloading {} from {}".format(chunk_UUID, host))
                 channel.close()
