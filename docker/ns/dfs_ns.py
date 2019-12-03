@@ -133,6 +133,7 @@ def broadcast_nuke():
                 channel.close()
             except Exception as e:
                 print("nuke:", e)
+
     thread = Thread(target=broadcast_nuke_thread)
     thread.start()
 
@@ -578,6 +579,17 @@ class DFS_NSPrivateServicer(dfs_pb2_grpc.DFS_NSPrivateServicer):
             for c in ss_chunks:
                 if c in actual_chunks:
                     upd = CHUNKS.update_one({"_id": c}, {'$addToSet': {'hosts': ss_uuid}})
+                    try:
+                        ch = CHUNKS.find_one({"_id": c})
+                        if ch and "chunks" in ch:
+                            # If this chunk is now owned only by one storage
+                            # and there are more than 1 active storages
+                            if len(ch["chunks"]) == 1 and len(STORAGES) > 1:
+                                wrapper = [c]
+                                dispatcher.send(chunks=wrapper, command=dfs_pb2.UpdateCMD.get,
+                                                signal=SIGNAL_BROADCAST_UPDATE)
+                    except Exception as e:
+                        print(e)
 
             if len(missing_chunks) == 0 and len(junk_chunks) == 0:
                 print("Storage has actual information")
