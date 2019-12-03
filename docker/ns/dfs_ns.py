@@ -105,29 +105,36 @@ def chunks_update_generator(chunks, command):
 
 def broadcast_update(chunks, command):
     # dfs_pb2.UpdateCMD.get / dfs_pb2.UpdateCMD.remove
-    for s in STORAGES:
-        address = STORAGES[s]["private_address"]
-        try:
-            channel = grpc.insecure_channel(address)
-            stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
-            cmd_generator = chunks_update_generator(chunks, command)
-            response = stub.Sync(cmd_generator, timeout=5)
-            print(response)
-            channel.close()
-        except Exception as e:
-            print("Sync:", e)
+    def broadcast_update_thread(chunks, command):
+        for s in STORAGES:
+            address = STORAGES[s]["private_address"]
+            try:
+                channel = grpc.insecure_channel(address)
+                stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
+                cmd_generator = chunks_update_generator(chunks, command)
+                response = stub.Sync(cmd_generator, timeout=5)
+                print(response)
+                channel.close()
+            except Exception as e:
+                print("Sync:", e)
+
+    thread = Thread(target=broadcast_update_thread, args=(chunks, command))
+    thread.start()
 
 
 def broadcast_nuke():
-    for s in STORAGES:
-        address = STORAGES[s]["private_address"]
-        try:
-            channel = grpc.insecure_channel(address)
-            stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
-            response = stub.Nuke(Empty(), timeout=5)
-            channel.close()
-        except Exception as e:
-            print("nuke:", e)
+    def broadcast_nuke_thread():
+        for s in STORAGES:
+            address = STORAGES[s]["private_address"]
+            try:
+                channel = grpc.insecure_channel(address)
+                stub = dfs_pb2_grpc.DFS_SSPrivateStub(channel)
+                response = stub.Nuke(Empty(), timeout=5)
+                channel.close()
+            except Exception as e:
+                print("nuke:", e)
+    thread = Thread(target=broadcast_nuke_thread)
+    thread.start()
 
 
 def get_fileattr_id(filesystem, fake_path):
