@@ -2,6 +2,6 @@ appdirs==1.4.3
 colorama==0.4.1
 grpcio==1.25.0
 grpcio-tools==1.25.0
-protobuf==3.11.0
+protobuf==3.18.3
 pytz==2019.3
 six==1.13.0
