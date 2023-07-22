@@ -1,7 +1,7 @@
 appdirs==1.4.3
 colorama==0.4.1
 fs==2.4.11
-grpcio==1.25.0
+grpcio==1.53.0
 grpcio-tools==1.25.0
 protobuf==3.11.0
 PyDispatcher==2.0.5
